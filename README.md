@@ -15,19 +15,19 @@ Na indústria de manufatura contínua (com forte foco no fluxo flexográfico), o
 
 ``` mermaid
 flowchart LR
-    subgraph Origem
+    subgraph Origem ["Origem"]
         A1[Fichas Técnicas] --> A[Coleta de Apontamentos]
         A2[Chão de Fábrica] --> A
     end
 
-    subgraph Processamento Lógico (Database Engine)
+    subgraph Processamento ["Processamento Lógico (Database Engine)"]
         B1[Check de Governança de Usuários] --> B2
         B2[Loop Cronológico por Etapas] --> B3
         B3[Cálculo de Fatores e Desdobramento] --> B4
         B4{Produção Reportada < Saldo Esperado?} 
     end
 
-    subgraph Camada de Entrega
+    subgraph Entrega ["Camada de Entrega"]
         C1[(ERP - Tabela de Perdas)]
         B4 -- Sim --> C1
     end
