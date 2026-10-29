@@ -1,4 +1,4 @@
-# Otimização do Balanço de Massa e Apontamento de Perdas (ERP/Manufatura)
+# Otimização do Balanço de Massa e Apontamento de Perdas
 
 ## 📌 O Desafio de Negócio (Contexto)
 Na indústria de manufatura contínua (com forte foco no fluxo flexográfico), ocorrem divergências constantes entre a matéria-prima inserida e a quantidade de produto acabado reportado. Anteriormente, as perdas de material entre etapas produtivas (Extrusão, Impressão, Corte) dependiam do apontamento manual dos operadores. Isso gerava inconsistências nos balanços de massa, ofuscava os gargalos no chão de fábrica e deturpava o custo real (CMV) das Ordens de Produção (OPs).
