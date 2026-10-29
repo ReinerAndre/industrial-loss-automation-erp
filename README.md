@@ -13,7 +13,7 @@ Na indústria de manufatura contínua (com forte foco no fluxo flexográfico), o
 
 📐 Arquitetura do Fluxo de Dados
 
-```mermaid
+``` mermaid
 flowchart LR
     subgraph Origem
         A1[Fichas Técnicas] --> A[Coleta de Apontamentos]
