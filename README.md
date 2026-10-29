@@ -1,19 +1,17 @@
-# Otimização do Balanço de Massa e Apontamento de Perdas (ERP/Manufatura)
+# Otimización do Balanço de Massa e Apontamento de Perdas (ERP/Manufatura)
 
-## 📌 O Desafio de Negócio
-
+## 📌 O Desafio de Negócio (Contexto)
 Na indústria de manufatura contínua (com forte foco no fluxo flexográfico), ocorrem divergências constantes entre a matéria-prima inserida e a quantidade de produto acabado reportado. Anteriormente, as perdas de material entre etapas produtivas (Extrusão, Impressão, Corte) dependiam do apontamento manual dos operadores. Isso gerava inconsistências nos balanços de massa, ofuscava os gargalos no chão de fábrica e deturpava o custo real (CMV) das Ordens de Produção (OPs).
 
 ## 🎯 O Objetivo
-
 - Automatizar o apontamento de perdas "ocultas" (parasitas) que não eram reportadas manualmente.
 - Ajustar os cálculos dinamicamente considerando processos complexos (ex: desdobramento de bobinas/pistas).
 - Validar as conversões de unidade de medida entre a matéria-prima e o produto final de forma sistêmica.
-- Garantir rastreabilidade para o sistema de BI visualizar exatamente em qual etapa a eficiência operacional caiu.
+- Disponibilizar um **Módulo de Auditoria Forense** para rastreabilidade e homologação dos cálculos.
 
-📐 Arquitetura do Fluxo de Dados
+## 📐 Arquitetura do Fluxo de Dados
 
-``` mermaid
+```mermaid
 flowchart LR
     subgraph Origem ["Origem"]
         A1[Fichas Técnicas] --> A[Coleta de Apontamentos]
@@ -27,9 +25,11 @@ flowchart LR
         B4{Produção Reportada < Saldo Esperado?} 
     end
 
-    subgraph Entrega ["Camada de Entrega"]
+    subgraph Entrega ["Camada de Entrega e Auditoria"]
         C1[(ERP - Tabela de Perdas)]
+        C2[Script de Auditoria Forense]
         B4 -- Sim --> C1
+        C1 -. Validação .-> C2
     end
 
     A --> B1
@@ -38,18 +38,16 @@ flowchart LR
 
 ## 🛠️ A Solução Técnica
 
-* Desenvolvemos uma procedure autônoma acionada via trigger/evento transacional no banco de dados, no momento do encerramento das OPs.
+1. O repositório é composto por dois artefatos principais:
 
-* Modularidade de Cursor: Um cursor central (c_etapas) utiliza LEFT JOINS para unificar toda a rastreabilidade da OP cronologicamente.
+2. Motor Transacional (automation_trigger.sql): Procedure acionada no encerramento de OPs que injeta perdas sistêmicas calculadas de forma idempotente.
 
-* Adaptação Dinâmica: O script possui lógicas específicas de negócio, lendo atributos flexíveis (tipo_ficha) para entender de forma autônoma se o item exige cálculos de desdobramento de pistas (ex: divisão de rolos longos em bobinas menores).
-
-* Tratamento Idempotente: A rotina de perdas automatizadas faz uma limpeza prévia para prevenir duplicação de dados e garantir precisão na tabela final (tipo_perda = 33).
+3. Auditor Forense (audit_hidden_losses_forensic.sql): Script de diagnóstico com saída via DBMS_OUTPUT que simula o comportamento do motor passo a passo para qualquer OP fechada, permitindo comparar o volume esperado pela engenharia contra o reportado pelo operador.
 
 ## 🚀 Impacto Esperado (ou Real)
 
-* Fechamento de Custos Preciso: Visibilidade real do desperdício de insumos, permitindo à diretoria atuar na etapa específica (ex: erro no refile do corte ou acerto de impressão longo).
+* Fechamento de Custos Preciso: Visibilidade real do desperdício de insumos por etapa.
 
-* Auditoria 100% Sistêmica: Redução drástica dos furos de estoque criados por omissão humana de apontamentos de refugo no chão de fábrica.
+* Transparência e Debug Rápido: O script de auditoria permite que a equipe de engenharia valide inconsistências apontadas pelo chão de fábrica em segundos.
 
-* Governança Fortalecida: Trava lógica bloqueando usuários não autorizados do grupo operacional de burlarem ou encerrarem fluxos críticos da produção sem validação do PPCP.
+* Governança Fortalecida: Trava lógica bloqueando usuários não autorizados de burlar fluxos críticos sem aval do PPCP.
