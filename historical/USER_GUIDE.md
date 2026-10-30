@@ -47,3 +47,27 @@ Recomenda-se encapsular o script numa `VIEW` no schema analítico:
 ```sql
 CREATE OR REPLACE VIEW dw_manufatura.vw_auditoria_perdas_etapa AS
 -- [Inserir o código SQL - historical_data_analysis.sql]
+```
+### Configuração de Visuais no BI
+
+1. Visual de Matriz (Fluxo da Esteira Produtiva):
+   
+    * Linhas: id_ordem_producao, ds_produto, ds_componente, fornecedor_componente.
+    * Colunas: cd_etapa_atual ou nm_etapa_atual.
+    * Valores: qt_boa_equiv_mae_rateada_mt (Soma) e qt_perda_real_rateada_mt (Soma).
+      
+2. Formatação Condicional (Farol):
+   
+  * Aplicar regra de cor de fundo no campo ds_status_farol:
+      * CRÍTICO Vermelho Escuro (#D9534F)
+      * ATENÇÃO Âmbar (#F0AD4E)
+      * ALERTA LEVE Amarelo Claro (#FCF8E3)
+      * OK Verde Claro (#5CB85C)
+        
+## 4. Troubleshooting & FAQ
+
+* **P: Por que a produção na etapa de Selagem é muito maior que na Impressão?**  
+  *R:* A etapa opera com múltiplas pistas (*slitting* já efetuado). Para comparar com a matéria-prima de entrada, utilize sempre a coluna `qt_boa_equiv_mae_rateada_mt`.
+
+* **P: A soma das perdas rateadas bate exatamente com o total apontado na OP?**  
+  *R:* Sim. A soma das proporções de carga de todos os componentes da OP resulta sempre em 1,000000 (100%), o que assegura matematicamente que não há criação nem desaparecimento de metros lineares de refugo.
